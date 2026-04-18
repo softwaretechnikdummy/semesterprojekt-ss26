@@ -21,3 +21,8 @@
 >- The bottom navigation should only show "Target" and "Profile". But the "Profile" section should have a different wording and icon indicating that it is connected closely to your agent identity.
 
 ![prompt2 result](https://github.com/user-attachments/assets/89238fab-c4e0-4ef8-899d-cf58a3186213)
+
+## Third prompt (gamemaster ui)
+> Could you now please also create a gamemaster view? This should be a deskop pc (so horizontal 16:9 layout). There should be a visual graph displaying all the players as nodes and then connecting them via links with the target words. Hovering over this main graph should be button to create a new game, add a player, show a log of what happened
+
+![prompt3 result](https://github.com/user-attachments/assets/5729d165-f008-4e8e-932a-1b51828ccb49)
