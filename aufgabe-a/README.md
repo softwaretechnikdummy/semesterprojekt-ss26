@@ -1,5 +1,9 @@
 # Vibe UI Development process
 
+Mit Google Stich habe ich in der ersten Präsenzveranstaltung versucht, eine UI für mein Assassin-Projekt zu kreieren.
+Im Folgenden sind die drei Prompts zu sehen und die entsprechend entstandenen UI-Mockups.
+Für eine erste Inspiration waren diese Ergebnisse zufriedenstellend. Allerdings hatte ich bereits eine simple Struktur im Kopf, von der ich nicht mehr so stark abweichen wollte.
+
 ## First prompt
 
 >I am trying to create digital version of a party game called "assassin". Each guest receives a target player and a target word. The objective is to make the target player say the target word during natural conversation. Can you please create a UI with the following features?
