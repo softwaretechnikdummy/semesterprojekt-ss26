@@ -1,0 +1,259 @@
+body {
+    background: #4d0c0c;
+    background: linear-gradient(0deg, rgb(77, 12, 12) 0%, rgb(6, 6, 16) 18%);
+    user-select: none;
+}
+
+#lobby_button_help {
+}
+
+#status_bar {
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.8rem;
+    color: white;
+    opacity: 0.3;
+    font-family: monospace;
+    width: 100%;
+    text-align: center;
+}
+
+#lobby-main-container {
+    display: inline-block;
+}
+
+#lobby-intro {
+    position: relative;
+}
+
+#lobby-code-container {
+
+}
+
+.lobby-container {
+    position: relative;
+    background: #0b0f1d;
+    padding: 3rem 0rem;
+    font-family: monospace;
+    border-radius: 20px;
+}
+
+#lobby_mykillcount span {
+    color: #e62d2d;
+    text-shadow: 0px 0px 8px #d72d2d;
+}
+
+.lobby-secret {
+    color: #e62d2d;
+    text-shadow: 0px 0px 8px #d72d2d;
+    font-size: 3rem;
+    text-transform: lowercase;
+    overflow: scroll;
+}
+.lobby-secret-green {
+    color: #00c130;
+    text-shadow: 0px 0px 8px #5c8e5f;
+}
+.lobby-secret-texteffect {
+    color: #e62d2d;
+    text-shadow: 0px 0px 8px #d72d2d;
+}
+.lobby-heading-texteffect {
+    color: gray;
+    text-shadow: 0px 0px 10px #696161;
+}
+
+#lobby_word_button_redraw {
+    font-size: 1.8rem;
+}
+
+.lobby-heading {
+    font-size: 1rem;
+    color: gray;
+    text-shadow: 0px 0px 10px #696161;
+}
+
+.lobby-container {
+    user-select: none;
+}
+
+.lobby-container > * {
+    transition: filter .1s ease-in-out;
+}
+
+.lobby-secrets-hidden > *:not(.lobby-secrets-toggle) {
+    filter:blur(50px);
+}
+
+.lobby-secrets-toggle {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+}
+.lobby-secrets-toggle i {
+    font-size: 3rem;
+}
+
+.lobby-secrets-hidden .lobby-secrets-toggle {
+    display: block;
+}
+
+#lobby_button_report_mission_done {
+    position: relative;
+    font-size: 1rem;
+    font-family: monospace;
+    background-color: #000;
+    border-color: white;
+    padding: 1rem 0;
+    border-radius: 20px;
+}
+#lobby_button_report_mission_done button:active {
+    background-color: #0a0a0a !important;
+    border-color: white !important;
+}
+#lobby_button_report_mission_done i {
+    position: absolute;
+    font-size: 2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 1rem;
+}
+
+#lobby_button_report_mission_failed {
+    position: relative;
+    font-size: 1rem;
+    font-family: monospace;
+    background-color: #000;
+    border-color: white;
+    padding: 1rem 0;
+    border-radius: 20px;
+}
+#lobby_button_report_mission_failed button:active {
+    background-color: #0a0a0a !important;
+    border-color: white !important;
+}
+#lobby_button_report_mission_failed i {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 1rem;
+    font-size: 2rem;
+}
+
+.modal {
+    background: #4d0c0c;
+    background: linear-gradient(0deg, rgb(77, 12, 12) 0%, rgb(6, 6, 16) 18%);
+}
+
+.modal .modal-content {
+    border: 1px solid #484848;
+    background: #060512;
+    padding: 1rem 1rem;
+}
+
+#lobby_code, #lobby_mysecret {
+    text-transform: uppercase;
+    letter-spacing: 1.5rem;
+    margin-right: -1.5rem;
+}
+
+#lobby_mysecret {
+    text-transform: uppercase;
+    letter-spacing: 1.5rem;
+    margin-right: -1.5rem;
+}
+
+.modal button {
+    position: relative;
+    font-size: 1rem;
+    font-family: monospace;
+    background-color: #000;
+    border-color: white;
+    padding: 1rem 0;
+    border-radius: 20px;
+}
+
+.modal button.btn-primary {
+    background-color: #480000;
+}
+
+.modal button:disabled {
+    background-color: #171717;
+    border-color: white;
+}
+
+.modal button:hover {
+    background-color: #1a1a1a !important;
+    border-color: white !important;
+}
+
+.modal button:active {
+    background-color: #393939 !important;
+    border-color: white !important;
+}
+
+.lobby-dummyinput {
+    opacity: 0;
+}
+
+#lobby_secrets_targetsecret {
+    padding-bottom: 1rem;
+    position: relative;
+}
+
+#lobby_secrets_targetsecret_input {
+    position: relative;
+}
+
+.lobby-help {
+    position: absolute;
+    bottom: 10px;
+    font-size: 0.8rem;
+}
+
+.lobby-help > span {    
+    /*border: 1px solid gray;*/
+    padding: 5px 10px;
+    border-radius: 8px;
+    color: gray;
+}
+
+#lobby_secrets_targetsecret_input input, #lobby_secrets_targetsecret_input .lobby-box-input-char {
+    font-size: 2rem;
+}
+
+.lobby-box-input {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+}
+
+#lobby_secrets_targetsecret_wrongsecret {
+    font-size: 1rem;
+}
+
+.lobby-box-input-char {
+    border-bottom: 3px solid #a5a5a5;
+    color: #e62d2d;
+    text-shadow: 0px 0px 8px #d72d2d;
+    text-transform: uppercase;
+}
+
+#modal_missioncomplete.correctcode .lobby-box-input-char {
+    color: #00c130;
+    text-shadow: 0px 0px 8px #5c8e5f;    
+}
+
+#modal_rules .list-group {
+    max-height: 50vh;
+    overflow: scroll;  
+}
+
+#modal_rules .list-group-item {
+    background-color: transparent;
+}

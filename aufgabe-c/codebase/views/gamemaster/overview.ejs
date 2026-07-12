@@ -1,0 +1,910 @@
+<!doctype html>
+<html lang="en" class="h-100" data-bs-theme="dark">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="Anton Kurth">
+        <title>Assassin - GameMaster</title>
+
+        <link href="/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/bootstrap-icons/bootstrap-icons.min.css">
+        <script src="/js/bootstrap.bundle.min.js"></script>
+        <script src="/js/jquery.3.7.1.min.js"></script>
+        <script src="/js/tom-select.complete.min.js"></script>
+
+        <!-- GOJS -->
+        <script src="/js/go-debug.js"></script>
+        <link href="/css/prism.min.css" rel="stylesheet" />
+        <script src="/js/prism.min.js"></script>
+
+        <!-- Custom -->
+        <script src="/js/reconnectingws.js"></script>
+
+        <!-- Favicons -->
+        <link rel="mask-icon" href="/favicon.svg" color="#F12E6D">
+        <link rel="icon" href="/favicon.svg">
+
+        <meta name="format-detection" content="telephone=no">
+
+        <meta name="theme-color" content="#F12E6D" media="(prefers-color-scheme: light)">
+        <meta name="theme-color" content="#F12E6D" media="(prefers-color-scheme: dark)">
+
+        <link href="/css/tom-select.default.min.css" rel="stylesheet">
+        <link href="/style.css?v=1" rel="stylesheet">
+        <link href="/app/gamemaster.css?v=1" rel="stylesheet">
+    </head>
+
+    <body class="d-flex h-100">
+        <div id="modal_newgame" class="modal" tabindex="-1">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">create new game</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="modal_newgame_players" class="form-label">players</label>
+                        <textarea class="form-control" id="modal_newgame_players" rows="6" autocomplete="off"></textarea>
+                    </div>
+                    <div class="">
+                        <label for="modal_newgame_words" class="form-label">words</label>
+                        <textarea class="form-control" id="modal_newgame_words" rows="6" autocomplete="off"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">cancel</button>
+                  <button id="modal_newgame_create" type="button" class="btn btn-primary">create game</button>
+                </div>
+              </div>
+            </div>
+        </div>
+        <div id="modal_endgame" class="modal" tabindex="-1">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">end game</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>you can prematurely end the game if needed.</p>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">cancel</button>
+                  <button id="modal_endgame_submit" type="button" class="btn btn-primary">end game</button>
+                </div>
+              </div>
+            </div>
+        </div>
+        <div id="modal_lobby" class="modal" tabindex="-1">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">lobby</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-underline" id="modal_lobby_navbar">
+                        <li class="nav-item" id="modal_lobby_navbar_waiting">
+                          <div class="nav-link active">waiting</div>
+                        </li>
+                        <li class="nav-item" id="modal_lobby_navbar_associated">
+                          <div class="nav-link">associated</div>
+                        </li>
+                    </ul>
+                    <div id="modal_lobby_area_waiting">
+                        <div id="modal_lobby_waiting">
+                            
+                        </div>
+                    </div>
+                    <div id="modal_lobby_area_associated" class="d-none">
+                        <div id="modal_lobby_associated">
+                            
+                        </div>
+                    </div>
+                    <div id="modal_lobby_area_associate" code="" last="waiting" class="d-none">
+                        <button type="button" class="btn btn-sm btn-secondary" id="modal_lobby_associate_abort"><i class="bi bi-chevron-left"></i></button>
+
+                        <div class="card my-2">
+                            <div class="card-body">
+                                <div class="info">
+                                </div>
+                            </div>
+                        </div>
+                        <div id="modal_lobby_associate_players" class="d-flex flex-wrap gap-2">
+                            
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">close</button>
+                </div>
+              </div>
+            </div>
+        </div>
+
+        <div id="modal_wordpool" class="modal" tabindex="-1">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">wordpool</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="">
+                        <label for="modal_wordpool_words" class="form-label">words</label>
+                        <textarea class="form-control" id="modal_wordpool_words" rows="6" autocomplete="off"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="modal_wordpool_save" type="button" class="btn btn-primary">save</button>
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">close</button>
+                </div>
+              </div>
+            </div>
+        </div>
+
+        <div id="modal_history" class="modal" tabindex="-1">
+            <div class="modal-dialog" style="max-width: 700px;">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">history</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="list-group p-2" id="modal_history_history">
+
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">close</button>
+                </div>
+              </div>
+            </div>
+        </div>
+
+        <div id="modal_addplayer" class="modal" tabindex="-1">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">add player</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">name</span>
+                        <input type="text" class="form-control" id="modal_addplayer_name" autocomplete="off">
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">word</span>
+                        <input type="text" class="form-control" id="modal_addplayer_word" autocomplete="off">
+                        <button id="modal_addplayer_word_generate" type="button" class="btn btn-gamemaster position-relative">
+                            <i class="bi bi-arrow-repeat"></i>
+                        </button>
+                    </div>
+                    <div id="modal_addplayer_possibilities">
+                        
+                    </div>
+                    <div id="modal_addplayer_options" class="d-none">
+                        <div class="card mt-2">
+                            <div class="card-header d-flex w-100 justify-content-between align-items-center">
+                                <h5>option 1</h5>
+                                <button type="button" id="modal_addplayer_option1" class="btn btn-sm btn-primarsy modal_btn float-end" autocomplete="off" disabled>choose</button>
+                            </div>
+                            <div class="card-body">
+                                <div><span id="modal_addplayer_option1_before" class="playerpill">platzhalter</span></div>
+                                <div><i class="bi bi-arrow-down"></i></div>
+                                <div><span id="modal_addplayer_option1_oldword" class="wordpill">platzhalter</span></div>
+                                <div><i class="bi bi-arrow-down"></i></div>
+                                <div><span id="modal_addplayer_option1_newplayer" class="playerpill">platzhalter</span></div>
+                                <div><i class="bi bi-arrow-down"></i></div>
+                                <div><span id="modal_addplayer_option1_newword" class="wordpill">platzhalter</span></div>
+                                <div><i class="bi bi-arrow-down"></i></div>
+                                <div><span id="modal_addplayer_option1_after" class="playerpill">platzhalter</span></div>
+                            </div>
+                        </div>
+                        <div class="card mt-2">
+                            <div class="card-header d-flex w-100 justify-content-between align-items-center">
+                                <h5>option 2</h5>
+                                <button type="button" id="modal_addplayer_option2" class="btn btn-sm btn-primarsy modal_btn float-end" autocomplete="off" disabled>choose</button>
+                            </div>
+                            <div class="card-body">
+                                <div><span id="modal_addplayer_option2_before" class="playerpill">platzhalter</span></div>
+                                <div><i class="bi bi-arrow-down"></i></div>
+                                <div><span id="modal_addplayer_option2_newword" class="wordpill">platzhalter</span></div>
+                                <div><i class="bi bi-arrow-down"></i></div>
+                                <div><span id="modal_addplayer_option2_newplayer" class="playerpill">platzhalter</span></div>
+                                <div><i class="bi bi-arrow-down"></i></div>
+                                <div><span id="modal_addplayer_option2_oldword" class="wordpill">platzhalter</span></div>
+                                <div><i class="bi bi-arrow-down"></i></div>
+                                <div><span id="modal_addplayer_option2_after" class="playerpill">platzhalter</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">close</button>
+                </div>
+              </div>
+            </div>
+        </div>
+
+        <div id="modal_manageplayer" class="modal" tabindex="-1" data-bs-backdrop="static">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">manage player</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">name</span>
+                        <input type="text" class="form-control" id="modal_manageplayer_name" autocomplete="off">
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">word</span>
+                        <input type="text" class="form-control" id="modal_manageplayer_word" autocomplete="off">
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">badge</span>
+                        <input type="text" class="form-control" id="modal_manageplayer_badge" autocomplete="off" disabled>
+                    </div>
+                    <div class="card">
+                        <div class="card-header d-flex w-100 justify-content-between align-items-center">
+                            <h5>preview</h5>
+                            <button type="button" id="modal_manageplayer_save" class="btn btn-sm btn-primarsy modal_btn float-end" autocomplete="off" disabled>save</button>
+                        </div>
+                        <div class="card-body">
+                            <div><span id="modal_manageplayer_preview_player" class="playerpill">platzhalter</span></div>
+                            <div><i class="bi bi-arrow-down"></i></div>
+                            <div><span id="modal_manageplayer_preview_word" class="wordpill">platzhalter</span></div>
+                            <div><i class="bi bi-arrow-down"></i></div>
+                            <div><span id="modal_manageplayer_preview_after" class="playerpill">platzhalter</span></div>
+                        </div>
+                    </div>
+                    <div class="card mt-2">
+                        <div class="card-header d-flex w-100 justify-content-between align-items-center">
+                            <h5>actions</h5>
+                        </div>
+                        <div class="card-body">
+                            <button type="button" id="modal_manageplayer_deleteplayer" class="btn btn-primarsy modal_btn">delete player</button>
+                        </div>
+                    </div>
+                </div>
+              </div>
+            </div>
+        </div>
+
+        <div id="modal_deleteplayer" class="modal" tabindex="-1" data-bs-backdrop="static">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">delete player</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        You can delete <span class="playerpill" id="modal_deleteplayer_name">player name</span> in case they don't show up to the party. Please choose one of the deletion options below.
+                    </p>
+                    <div class="card mt-2">
+                        <div class="card-header d-flex w-100 justify-content-between align-items-center">
+                            <h5>keep incoming word</h5>
+                            <button type="button" id="modal_deleteplayer_option1" class="btn btn-sm btn-primarsy modal_btn float-end" autocomplete="off">choose</button>
+                        </div>
+                        <div class="card-body">
+                            <div><span id="modal_deleteplayer_option1_before" class="playerpill">platzhalter</span></div>
+                            <div><i class="bi bi-arrow-down"></i></div>
+                            <div><span id="modal_deleteplayer_option1_word" class="wordpill">platzhalter</span></div>
+                            <div><i class="bi bi-arrow-down"></i></div>
+                            <div><span id="modal_deleteplayer_option1_after" class="playerpill">platzhalter</span></div>
+                        </div>
+                    </div>
+                    <div class="card mt-2">
+                        <div class="card-header d-flex w-100 justify-content-between align-items-center">
+                            <h5>keep outgoing word</h5>
+                            <button type="button" id="modal_deleteplayer_option2" class="btn btn-sm btn-primarsy modal_btn float-end" autocomplete="off">choose</button>
+                        </div>
+                        <div class="card-body">
+                            <div><span id="modal_deleteplayer_option2_before" class="playerpill">platzhalter</span></div>
+                            <div><i class="bi bi-arrow-down"></i></div>
+                            <div><span id="modal_deleteplayer_option2_word" class="wordpill">platzhalter</span></div>
+                            <div><i class="bi bi-arrow-down"></i></div>
+                            <div><span id="modal_deleteplayer_option2_after" class="playerpill">platzhalter</span></div>
+                        </div>
+                    </div>
+                </div>
+              </div>
+            </div>
+        </div>
+
+        <div class="d-flex w-100 h-100 p-0 mx-auto flex-column">
+            <div class="row h-100">
+                <div class="col-12">
+                    <div id="myDiagramDiv" style="border: solid 1px black; width: 100%; height: 100%; background: whitesmoke"></div>
+                </div>
+            </div>
+            <div id="overlay_topright" class="d-flex flex-column gap-3">
+                <button id="button_addplayer" type="button" class="btn btn-gamemaster position-relative">
+                    <i class="bi bi-person-plus"></i>
+                    add player
+                </button>
+                <button id="button_wordpool" type="button" class="btn btn-gamemaster position-relative">
+                    <i class="bi bi-journal-text"></i>
+                    wordpool
+                </button>
+                <button id="button_show_lobby" type="button" class="btn btn-gamemaster position-relative">
+                    <i class="bi bi-link"></i>associations
+                    <span id="lobby_players_waiting" class="d-none position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                      <span id="lobby_players_waiting_count">0</span>
+                      <span class="visually-hidden">players waiting</span>
+                    </span>
+                </button>
+                <button id="button_history" type="button" class="btn btn-gamemaster position-relative">
+                    <i class="bi bi-clock-history"></i>
+                    history
+                </button>
+            </div>
+            <div id="overlay_bottomleft">
+                <button id="button_create_newgame" type="button" class="btn btn-gamemaster"><i class="bi bi-arrow-repeat"></i> create new game</button>
+                <button id="button_endgame" type="button" class="btn btn-gamemaster"><i class="bi bi-sign-stop"></i> end game</button>
+            </div>
+        </div>
+
+        <script src="/app/diagram_model.js"></script>
+
+        <script>
+            // Show the diagram's model in JSON format
+            function save() {
+                document.getElementById('mySavedModel').value = myDiagram.model.toJson();
+                myDiagram.isModified = false;
+            }
+
+            const ws_client = new ReconnectingWebSocketClient(`wss://${location.host}/gamemaster`);
+            var gamestate_lobby = {};
+            var gamestate_model = {};
+            
+            ws_client.onMessage = (event) => {
+                const message = JSON.parse(event.data);
+                if (message.type && message.type == 'model_update') {
+                    gamestate_model = message.data;
+                    myDiagram.model = go.Model.fromJson(message.data);
+
+                    $("#modal_lobby_associate_players").html("");
+                    $("#modal_addplayer_possibilities").html("");
+                    for (var node of gamestate_model.nodeDataArray) {
+                        $("#modal_lobby_associate_players").append(`
+                            <button type="button" class="btn btn-primary modal_btn modal_lobby_button_associate_player ${node.lobby_code && node.lobby_code == $("#modal_lobby_area_associate").attr("highlight") ? "associated_highlight" : ""}" uuid="${node.uuid}" ${node.lobby_code ? "disabled": ""}>${node.text}<i class="bi bi-check"></i></button>
+                        `);
+
+                        var link_outgoing = gamestate_model.linkDataArray.find(link => { return link.from == node.uuid });
+                        var link_incoming = gamestate_model.linkDataArray.find(link => { return link.to == node.uuid });
+
+                        var insert_after_node = link_incoming ? gamestate_model.nodeDataArray.find(n => { return n.uuid == link_incoming.from; }) : null;
+
+                        if (link_outgoing && link_incoming && insert_after_node && !insert_after_node.lobby_code) {
+                            $("#modal_addplayer_possibilities").append(`
+                                <div class="card my-2">
+                                    <div class="card-body">
+                                        <div class="d-flex w-100 justify-content-between align-items-center">
+                                            <div class="info">
+                                                <div><span class="playerpill">${insert_after_node.text}</span></div>
+                                                <div><i class="bi bi-arrow-down"></i></div>
+                                                <div><span class="wordpill">${link_incoming.word}</span></div>
+                                                <div><i class="bi bi-arrow-down"></i></div>
+                                                <div><span class="playerpill">${node.text}</span></div>
+                                            </div>
+                                            <button type="button" class="btn btn-primarsy modal_btn modal_addplayer_show_options" insert_after_node="${insert_after_node.uuid}" autocomplete="off" disabled>insert inbetween</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            `)
+                        }
+                    }
+
+                    $("#modal_history_history").html("");
+                    for (const [i, entry] of gamestate_model.modelHistory.entries()) {
+                        $("#modal_history_history").append(`
+                            <div class="list-group-item ${(i === gamestate_model.modelHistory.length - 1) ? "modal_history_lastentry": ""}">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <small class="text-body-secondary history-time pe-1">${new Date(entry.time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false })}</small>
+                                    <small class="text-body-secondary history-message px-2">${entry.message}</small>
+                                </div>
+                            </div>                        
+                        `)
+                    }
+
+                    $("#modal_wordpool_words").val(gamestate_model.wordPool.join('\n'));
+
+                    if (gamestate_model.game_is_over) {
+                        $("#button_addplayer").attr("disabled", true);
+                        $("#button_wordpool").attr("disabled", true);
+                        $("#button_show_lobby").attr("disabled", true);
+                        $("#button_endgame").attr("disabled", true);
+                    } else {
+                        $("#button_addplayer").removeAttr("disabled");
+                        $("#button_wordpool").removeAttr("disabled");
+                        $("#button_show_lobby").removeAttr("disabled");
+                        $("#button_endgame").removeAttr("disabled");
+                    }
+                }
+                if (message.type && message.type == 'lobby_update') {
+                    gamestate_lobby = message.data;
+                    console.log('lobby update', message.data);
+
+                    var lobby_waiting = Object.keys(gamestate_lobby).filter(code => {
+                        if (!gamestate_lobby[code].online) return false;
+                        for (var node of gamestate_model.nodeDataArray) {
+                            if (node.lobby_code == code) return false; // this lobby code is already associated
+                        }
+                        return true;
+                    })
+                    var lobby_associated = Object.keys(gamestate_lobby).filter(code => {
+                        for (var node of gamestate_model.nodeDataArray) {
+                            if (node.lobby_code == code) return true; // this lobby code is already associated
+                        }
+                        return false;
+                    })
+                    
+                    $("#lobby_players_waiting_count").text(lobby_waiting.length);
+                    if (lobby_waiting.length > 0) {
+                        $("#lobby_players_waiting").removeClass("d-none");
+                    } else {
+                        $("#lobby_players_waiting").addClass("d-none");
+                    }
+
+                    $("#modal_lobby_waiting").html("");
+                    $("#modal_lobby_associated").html("");
+                    lobby_waiting_sorted = lobby_waiting.sort((a, b) => gamestate_lobby[b].registered - gamestate_lobby[a].registered);
+                    lobby_associated_sorted = lobby_associated.sort((a, b) => gamestate_lobby[b].registered - gamestate_lobby[a].registered);
+
+                    for (var code of lobby_waiting_sorted) {
+                        var registered = new Date(gamestate_lobby[code].registered);
+                        var hours = String(registered.getHours()).padStart(2, '0');
+                        var minutes = String(registered.getMinutes()).padStart(2, '0');
+
+                        $("#modal_lobby_waiting").append(`
+                            <div class="card my-2">
+                                <div class="card-body">
+                                    <div class="d-flex w-100 justify-content-between align-items-center">
+                                        <div class="info">
+                                            <h5 class="mb-1 font-monospace">${code}<i class="bi bi-circle-fill lobby-indicator-online"></i></h5>
+                                            <small>joined ${hours}:${minutes}</small>
+                                        </div>
+                                        
+                                        <button type="button" class="btn btn-primary modal_btn modal_lobby_button_associate" code="${code}"><i class="bi bi-link"></i> associate</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `)
+                    }
+
+                    for (var code of lobby_associated_sorted) {
+                        var registered = new Date(gamestate_lobby[code].registered);
+                        var hours = String(registered.getHours()).padStart(2, '0');
+                        var minutes = String(registered.getMinutes()).padStart(2, '0');
+
+                        var associated_node = gamestate_model.nodeDataArray.find(node => { return node.lobby_code == code});
+
+                        $("#modal_lobby_associated").append(`
+                            <div class="card my-2">
+                                <div class="card-body">
+                                    <div class="d-flex w-100 justify-content-between align-items-center">
+                                        <div class="info">
+                                            <h5 class="mb-1 font-monospace">${code}<i class="bi bi-circle-fill lobby-indicator-${gamestate_lobby[code].online ? "online" : "offline"}"></i></h5>
+                                            <div class="player">
+                                                ${associated_node.text}
+                                            </div>
+                                            <small>joined ${hours}:${minutes}</small>
+                                        </div>
+                                        
+                                        <div class="actions">
+                                            <button type="button" class="btn btn-primary modal_btn modal_lobby_button_associate" code="${code}"><i class="bi bi-link"></i> re-associate</button>
+                                            <button type="button" class="btn btn-primary modal_btn modal_lobby_button_disassociate" code="${code}"><i class="bi bi-x-lg"></i> disassociate</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `)
+                    }
+                }
+                if (message.type == 'player_modify') {
+                    var modal = bootstrap.Modal.getInstance(document.getElementById("modal_manageplayer"));
+                    if (modal) modal.hide();
+                }
+                console.log(message.data)
+            }
+
+            async function load() { ws_client.connect();}
+
+            window.addEventListener('DOMContentLoaded', load);
+
+            $("#button_create_newgame").on("click", function() {
+                (new bootstrap.Modal(document.getElementById('modal_newgame'))).show();
+            })
+            $("#modal_newgame_create").on("click", function() {
+                var players = $("#modal_newgame_players").val().split('\n');
+                var words = $("#modal_newgame_words").val().split('\n');
+
+                ws_client.send(JSON.stringify({
+                    type: 'game_create_new',
+                    data: {
+                        players,words
+                    }
+                }))
+            })
+
+            $("#button_endgame").on("click", function() {
+                (new bootstrap.Modal(document.getElementById('modal_endgame'))).show();
+            })
+
+            $("#modal_endgame_submit").on("click", function() {
+                ws_client.send(JSON.stringify({
+                    type: 'game_end'
+                }))
+            })
+
+            $("#button_addplayer").on("click", function() {
+                $("#modal_addplayer_name").val("");
+                $("#modal_addplayer_word").val("");
+                $("#modal_addplayer_possibilities").removeClass("d-none");
+                $("#modal_addplayer_options").addClass("d-none");
+                (new bootstrap.Modal(document.getElementById('modal_addplayer'))).show();
+            })
+
+            $("#button_wordpool").on("click", function() {
+                (new bootstrap.Modal(document.getElementById('modal_wordpool'))).show();
+            })
+            $("#modal_wordpool_save").on("click", function() {
+                var wordpool_new = $("#modal_wordpool_words").val().split('\n');
+                ws_client.send({
+                    type: 'wordpool_update',
+                    data: wordpool_new
+                });
+                var modal = bootstrap.Modal.getInstance(document.getElementById("modal_wordpool"));
+                if (modal) modal.hide();
+            })
+            $("#button_history").on("click", function() {
+                (new bootstrap.Modal(document.getElementById('modal_history'))).show();
+                $("#modal_history_history")[0].scrollTop = $("#modal_history_history")[0].scrollHeight;
+            })
+            $("#button_show_lobby").on("click", function() {
+                (new bootstrap.Modal(document.getElementById('modal_lobby'))).show();
+            })
+
+            function on_node_clicked(clicked_node) {
+                var uuid = clicked_node.data.uuid;
+                var player_node = gamestate_model.nodeDataArray.find(node => { return node.uuid == uuid });
+                if (!player_node) return;
+
+                if (player_node.lobby_code) {
+                    $("#modal_manageplayer_deleteplayer").attr("disabled", true);
+                } else {
+                    $("#modal_manageplayer_deleteplayer").removeAttr("disabled");
+                }
+
+                $("#modal_manageplayer").attr("uuid", uuid);
+
+                $("#modal_manageplayer_name").val(player_node.text);
+                $("#modal_manageplayer_preview_player").text(player_node.text);
+                $("#modal_manageplayer_badge").val(player_node.code);
+
+                var link_outgoing = gamestate_model.linkDataArray.find(link => { return link.from == uuid });
+                if (link_outgoing) {
+                    $("#modal_manageplayer_word").removeAttr("disabled");
+                    $("#modal_manageplayer_word").val(link_outgoing.word);
+                    $("#modal_manageplayer_preview_word").text(link_outgoing.word);
+
+                    var next_node = gamestate_model.nodeDataArray.find(node => { return node.uuid == link_outgoing.to });
+                    if (next_node) {
+                        $("#modal_manageplayer_preview_after").text(next_node.text);
+                    } else {
+                        $("#modal_manageplayer_preview_after").text("");
+                    }                 
+                } else {
+                    $("#modal_manageplayer_word").attr("disabled", true);
+                    $("#modal_manageplayer_preview_word").text("-");
+                    $("#modal_manageplayer_preview_after").text("-");
+                }
+                $("#modal_manageplayer_name").removeAttr("disabled", true);
+                (new bootstrap.Modal(document.getElementById('modal_manageplayer'))).show();
+            }
+
+            $("#modal_manageplayer_deleteplayer").on("click", function() {
+                var modal = bootstrap.Modal.getInstance(document.getElementById("modal_manageplayer"));
+                if (modal) modal.hide();
+
+                var uuid = $("#modal_manageplayer").attr("uuid");
+                var player_node = gamestate_model.nodeDataArray.find(node => { return node.uuid == uuid });
+                if (!player_node) return;
+           
+                var link_incoming = gamestate_model.linkDataArray.find(link => { return link.to == uuid });
+                if (!link_incoming) return;
+                var link_outgoing = gamestate_model.linkDataArray.find(link => { return link.from == uuid });
+                if (!link_outgoing) return;
+
+                var node_before = gamestate_model.nodeDataArray.find(node => { return node.uuid == link_incoming.from });
+                if (!node_before) return;
+                var node_after = gamestate_model.nodeDataArray.find(node => { return node.uuid == link_outgoing.to });
+                if (!node_after) return;
+
+                $("#modal_deleteplayer").attr("uuid", uuid);
+                $("#modal_deleteplayer_name").text(player_node.text);
+
+                $("#modal_deleteplayer_option1_before").text(node_before.text);
+                $("#modal_deleteplayer_option1_word").text(link_incoming.word);
+                $("#modal_deleteplayer_option1_after").text(node_after.text);
+                $("#modal_deleteplayer_option2_before").text(node_before.text);
+                $("#modal_deleteplayer_option2_word").text(link_outgoing.word);
+                $("#modal_deleteplayer_option2_after").text(node_after.text);
+
+                (new bootstrap.Modal(document.getElementById('modal_deleteplayer'))).show();
+            })
+
+            $("#modal_deleteplayer_option1").on("click", function() {
+                var uuid = $("#modal_deleteplayer").attr("uuid");
+                ws_client.send({
+                    type: 'player_delete',
+                    data: {
+                        uuid,
+                        option: 1
+                    }
+                })
+                var modal = bootstrap.Modal.getInstance(document.getElementById("modal_deleteplayer"));
+                if (modal) modal.hide();
+            });
+
+            $("#modal_deleteplayer_option2").on("click", function() {
+                var uuid = $("#modal_deleteplayer").attr("uuid");
+                ws_client.send({
+                    type: 'player_delete',
+                    data: {
+                        uuid,
+                        option: 2
+                    }
+                })
+                var modal = bootstrap.Modal.getInstance(document.getElementById("modal_deleteplayer"));
+                if (modal) modal.hide();
+            });
+
+            function modal_manageplayer_has_changed() {
+                var uuid = $("#modal_manageplayer").attr("uuid");
+                var player_node = gamestate_model.nodeDataArray.find(node => { return node.uuid == uuid });
+                if (!player_node) return false;
+                var link_outgoing = gamestate_model.linkDataArray.find(link => { return link.from == uuid });
+
+                var new_name = $("#modal_manageplayer_name").val();
+                var new_word = $("#modal_manageplayer_word").val();
+                if (new_name.trim().length == 0) return false;
+                if (new_word.trim().length == 0) return false;
+                
+                if ($("#modal_manageplayer_name").val() != player_node.text) return true;
+                if ($("#modal_manageplayer_word").val() != link_outgoing.word) return true;
+            }
+
+            function modal_manageplayer_monitor_changes() {
+                if (modal_manageplayer_has_changed()) {
+                    $("#modal_manageplayer_save").removeAttr("disabled");
+                } else {
+                    $("#modal_manageplayer_save").attr("disabled", true);
+                }
+            }
+
+            $("#modal_manageplayer_save").on("click", function() {
+                if (!modal_manageplayer_has_changed()) return;
+
+                var uuid = $("#modal_manageplayer").attr("uuid");
+                var player_node = gamestate_model.nodeDataArray.find(node => { return node.uuid == uuid });
+                if (!player_node) return false;
+                var link_outgoing = gamestate_model.linkDataArray.find(link => { return link.from == uuid });
+
+                var new_name = $("#modal_manageplayer_name").val();
+                var new_word = $("#modal_manageplayer_word").val();
+
+                ws_client.send({
+                    type: 'player_modify',
+                    data: {
+                        uuid,
+                        new_name,
+                        new_word
+                    }
+                });
+
+                $("#modal_manageplayer_name").attr("disabled", true);
+                $("#modal_manageplayer_word").attr("disabled", true);
+                $(this).attr("disabled", true);
+            })
+
+            $("#modal_manageplayer_name").on("input", function() {
+                $("#modal_manageplayer_preview_player").text($(this).val());
+                modal_manageplayer_monitor_changes();
+            })
+            $("#modal_manageplayer_word").on("input", function() {
+                $("#modal_manageplayer_preview_word").text($(this).val());
+                modal_manageplayer_monitor_changes();
+            })
+
+            document.getElementById('modal_lobby').addEventListener('hidden.bs.modal', function () {
+                $("#modal_lobby_navbar_waiting").click();
+            });
+
+            $("#modal_lobby_navbar_waiting").on("click", function() {
+                $("#modal_lobby_area_associated").addClass("d-none");
+                $("#modal_lobby_area_associate").addClass("d-none");
+                $("#modal_lobby_area_associate").attr("last", "waiting");
+                $("#modal_lobby_area_waiting").removeClass("d-none");
+                $("#modal_lobby_navbar_associated .nav-link").removeClass("active");
+                $("#modal_lobby_navbar_waiting .nav-link").addClass("active");
+            })
+
+            $("#modal_lobby_navbar_associated").on("click", function() {
+                $("#modal_lobby_area_associated").removeClass("d-none");
+                $("#modal_lobby_area_associate").addClass("d-none");
+                $("#modal_lobby_area_associate").attr("last", "associated");
+                $("#modal_lobby_area_waiting").addClass("d-none");
+                $("#modal_lobby_navbar_associated .nav-link").addClass("active");
+                $("#modal_lobby_navbar_waiting .nav-link").removeClass("active");
+
+                $("#modal_lobby_waiting").removeClass("d-none");
+                $("#modal_lobby_waiting_associate").addClass("d-none");
+            });
+
+            $("#modal_lobby_associate_abort").on("click", function() {
+                $("#modal_lobby_area_associate").addClass("d-none");
+                $("#modal_lobby_area_associated").addClass("d-none");
+                $("#modal_lobby_area_waiting").addClass("d-none");
+                if($("#modal_lobby_area_associate").attr("last") == "waiting") {
+                    $("#modal_lobby_area_waiting").removeClass("d-none");
+                } else {
+                    $("#modal_lobby_area_associated").removeClass("d-none");
+                }
+            })
+
+            $("body").on("click", ".modal_lobby_button_associate", function() {
+                $("#modal_lobby_area_waiting").addClass("d-none");
+                $("#modal_lobby_area_associated").addClass("d-none");
+                $("#modal_lobby_area_associate").removeClass("d-none");
+
+                var code = $(this).attr("code");
+                var registered = new Date(gamestate_lobby[code].registered);
+                var hours = String(registered.getHours()).padStart(2, '0');
+                var minutes = String(registered.getMinutes()).padStart(2, '0');
+
+                var associated_node = gamestate_model.nodeDataArray.find(node => { return node.lobby_code == code});
+
+                $("#modal_lobby_area_associate").attr("highlight", code);
+                $("#modal_lobby_area_associate").find(".info").html(`
+                    <h5 class="mb-1 font-monospace">${code}<i class="bi bi-circle-fill lobby-indicator-online"></i></h5>
+                    <small>joined ${hours}:${minutes}</small>
+                `)
+
+                $(".modal_lobby_button_associate_player").removeClass("associated_highlight")
+                if (associated_node) {
+                    $(`.modal_lobby_button_associate_player[uuid="${associated_node.uuid}"]`).addClass("associated_highlight")
+                }
+                $("#modal_lobby_area_associate").attr("code", code);
+            })
+
+            $("body").on("click", ".modal_lobby_button_associate_player", function() {
+                var code = $("#modal_lobby_area_associate").attr("code");
+                var uuid = $(this).attr("uuid");
+
+                ws_client.send({
+                    type: 'lobby_associate',
+                    data: {
+                        code, uuid
+                    }
+                })
+            })
+
+            $("body").on("click", ".modal_lobby_button_disassociate", function() {
+                var code = $(this).attr("code");
+
+                ws_client.send({
+                    type: 'lobby_disassociate',
+                    data: {
+                        code
+                    }
+                })
+            })
+    
+            $("#modal_addplayer_word_generate").on("click", function() {
+                if (gamestate_model.wordPool.length > 0)
+                    $("#modal_addplayer_word").val(gamestate_model.wordPool[Math.floor(Math.random() * gamestate_model.wordPool.length)])
+            })
+
+            function modal_addplayer_button_disabling() {
+                var name = $("#modal_addplayer_name").val().trim();
+                var word = $("#modal_addplayer_word").val().trim();
+                if (name.length > 0 && word.length > 0) {
+                    $(".modal_addplayer_show_options").removeAttr("disabled");
+                    $("#modal_addplayer_option1").removeAttr("disabled");
+                    $("#modal_addplayer_option2").removeAttr("disabled");
+                } else {
+                    $(".modal_addplayer_show_options").attr("disabled",true);
+                    $("#modal_addplayer_option1").attr("disabled",true);
+                    $("#modal_addplayer_option2").attr("disabled",true);
+                }
+            }
+
+            $("#modal_addplayer_name").on("input", function() {
+                $("#modal_addplayer_option1_newplayer").text($(this).val());
+                $("#modal_addplayer_option2_newplayer").text($(this).val());
+                modal_addplayer_button_disabling();
+            })
+            $("#modal_addplayer_word").on("input", function() {
+                $("#modal_addplayer_option1_newword").text($(this).val());
+                $("#modal_addplayer_option2_newword").text($(this).val());
+                modal_addplayer_button_disabling();
+            })
+
+            $("body").on("click", ".modal_addplayer_show_options", function() {
+                var name = $("#modal_addplayer_name").val();
+                var word = $("#modal_addplayer_word").val();
+
+                var insert_after_uuid = $(this).attr("insert_after_node");
+                var insert_after_node = gamestate_model.nodeDataArray.find(node => { return node.uuid == insert_after_uuid });
+                if (!insert_after_node) return;
+                var link_outgoing = gamestate_model.linkDataArray.find(link => { return link.from == insert_after_node.uuid });
+                if (!link_outgoing) return;
+                var node_after = gamestate_model.nodeDataArray.find(node => { return node.uuid == link_outgoing.to });
+                if (!node_after) return;
+
+                $("#modal_addplayer_option1_before").text(insert_after_node.text);
+                $("#modal_addplayer_option1_oldword").text(link_outgoing.word);
+                $("#modal_addplayer_option1_newplayer").text(name);
+                $("#modal_addplayer_option1_newword").text(word);
+                $("#modal_addplayer_option1_after").text(node_after.text);
+                $("#modal_addplayer_option1").attr("insert_after_node", insert_after_uuid);
+
+                $("#modal_addplayer_option2_before").text(insert_after_node.text);
+                $("#modal_addplayer_option2_newword").text(word);
+                $("#modal_addplayer_option2_newplayer").text(name);
+                $("#modal_addplayer_option2_oldword").text(link_outgoing.word);
+                $("#modal_addplayer_option2_after").text(node_after.text);
+                $("#modal_addplayer_option2").attr("insert_after_node", insert_after_uuid);
+
+                $("#modal_addplayer_possibilities").addClass("d-none");
+                $("#modal_addplayer_options").removeClass("d-none");
+            });
+
+            $("#modal_addplayer_option1").on("click", function() {
+                var name = $("#modal_addplayer_name").val();
+                var word = $("#modal_addplayer_word").val();
+                var insert_after_node = $(this).attr("insert_after_node");
+
+                if (name.length > 0 && word.length > 0) {
+                    ws_client.send({
+                        type: 'game_addplayer',
+                        data: {
+                            name: name,
+                            word: word,
+                            after: insert_after_node,
+                            before_keeps: true
+                        }
+                    });
+                }
+                var modal = bootstrap.Modal.getInstance(document.getElementById("modal_addplayer"));
+                if (modal) modal.hide();
+            })
+
+            $("#modal_addplayer_option2").on("click", function() {
+                var name = $("#modal_addplayer_name").val();
+                var word = $("#modal_addplayer_word").val();
+                var insert_after_node = $(this).attr("insert_after_node");
+
+                if (name.length > 0 && word.length > 0) {
+                    ws_client.send({
+                        type: 'game_addplayer',
+                        data: {
+                            name: name,
+                            word: word,
+                            after: insert_after_node,
+                            before_keeps: false
+                        }
+                    });
+                }
+                var modal = bootstrap.Modal.getInstance(document.getElementById("modal_addplayer"));
+                if (modal) modal.hide();
+            })
+        </script>
+    </body>
+</html>

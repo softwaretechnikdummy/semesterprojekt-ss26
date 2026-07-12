@@ -1,0 +1,9 @@
+.player-active {
+    background-color: #113609;
+}
+.player-expected {
+    background-color: #362909;
+}
+.player-onhold {
+    background-color: #522121;
+}

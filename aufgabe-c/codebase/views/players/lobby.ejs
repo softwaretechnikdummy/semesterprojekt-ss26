@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="en" class="h-100" data-bs-theme="dark">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="Anton Kurth">
+        <title>Assassin - Lobby</title>
+
+        <link href="/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/bootstrap-icons/bootstrap-icons.min.css">
+        <script src="/js/bootstrap.bundle.min.js"></script>
+        <script src="/js/jquery.3.7.1.min.js"></script>
+        <script src="/js/tom-select.complete.min.js"></script>
+
+        <!-- Custom -->
+        <script src="/js/reconnectingws.js"></script>
+
+        <!-- Favicons -->
+        <link rel="mask-icon" href="/favicon.svg" color="#F12E6D">
+        <link rel="icon" href="/favicon.svg">
+
+        <meta name="format-detection" content="telephone=no">
+
+        <meta name="theme-color" content="#F12E6D" media="(prefers-color-scheme: light)">
+        <meta name="theme-color" content="#F12E6D" media="(prefers-color-scheme: dark)">
+
+        <link href="/css/tom-select.default.min.css" rel="stylesheet">
+        <link href="/app/lobby.css?v=1" rel="stylesheet">
+        <link href="/style.css?v=1" rel="stylesheet">
+    </head>
+
+    <body class="d-flex h-100">
+        <div id="modal_missioncomplete" class="modal" data-bs-backdrop="static" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-body text-center">
+                    <h1 id="modal_missioncomplete_title">mission complete?</h1>
+                    <p class="lobby-heading" id="modal_missioncomplete_subtitle">ask your target to reveal their badge</p>
+                    <div id="lobby_secrets_targetsecret" class="row justify-content-center m-0 align-items-center lobby-container">
+                        <span class="lobby-heading" id="modal_missioncomplete_heading">
+                            enter target badge
+                        </span>
+                        <div id="lobby_secrets_targetsecret_input">
+                            <div class="lobby-box-input text-center">
+                                <span id="lobby_secrets_targetsecret_input_vis1" class="lobby-box-input-char">&nbsp;</span>
+                                <span id="lobby_secrets_targetsecret_input_vis2" class="lobby-box-input-char">&nbsp;</span>
+                                <span id="lobby_secrets_targetsecret_input_vis3" class="lobby-box-input-char">&nbsp;</span>
+                                <span id="lobby_secrets_targetsecret_input_vis4" class="lobby-box-input-char">&nbsp;</span>
+                            </div>
+                            <input type="text" class="lobby-dummyinput" autocomplete="off">
+                        </div>
+                        <div id="lobby_secrets_targetsecret_wrongsecret" class="lobby-secret d-none mt-2">
+                            wrong badge!
+                        </div>
+                        <div id="lobby_missioncomplete_killcount" class="lobby-secret d-none mt-2">
+                            
+                        </div>
+                        <div id="modal_missioncomplete_loading" class="spinner-border mt-2" style="visibility:hidden" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    <button type="button" id="modal_missioncomplete_close" class="btn btn-secondary w-100 mt-3" data-bs-dismiss="modal">close</button>
+                </div>
+              </div>
+            </div>
+        </div>
+        <div id="modal_word_redraw" class="modal" data-bs-backdrop="static" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-body text-center">
+                    <h1>redraw secret word</h1>
+                    <p class="lobby-heading">you are allowed to redraw your word <b class="lobby-secret-texteffect">once</b> during the party.</p>
+                    <div id="modal_word_redraw_pre_section" class="row justify-content-center m-0 align-items-center lobby-container">
+                        <span class="lobby-heading">
+                            your current secret word
+                        </span>
+                        <span class="lobby-secret">
+                            <span id="modal_word_redraw_currentword" class="lobby-secret-secret"></span>
+                        </span>
+                    </div>
+                    <div id="modal_word_redraw_success" class="row justify-content-center m-0 align-items-center lobby-container d-none">
+                        <span class="lobby-heading">
+                            new secret word assigned
+                        </span>
+                        <span class="lobby-secret">
+                            <span id="modal_word_redraw_new" class="lobby-secret-secret lobby-secret-green"></span>
+                        </span>
+                    </div>
+                    <div id="modal_word_redraw_failed" class="row justify-content-center m-0 align-items-center lobby-container d-none">
+                        <span class="lobby-heading">
+                            failed to redraw
+                        </span>
+                        <span class="lobby-secret">
+                            <span class="lobby-secret-secret">wordpool is empty</span>
+                        </span>
+                    </div>
+                    <button type="button" class="btn btn-primary w-100 mt-3" id="modal_word_redraw_submit"><i class="bi bi-arrow-repeat me-1"></i>redraw</button>
+                    <button type="button" class="btn btn-secondary w-100 mt-3" data-bs-dismiss="modal">close</button>
+                </div>
+              </div>
+            </div>
+        </div>
+        <div id="modal_ivegotkilled" class="modal" data-bs-backdrop="static" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-body text-center">
+                    <h1>i've got eliminated?</h1>
+                    <p class="lobby-heading">hand over your badge to your assassin if he got you!</p>
+                    <div id="lobby_secrets_mysecret" class="row justify-content-center m-0 align-items-center lobby-container lobby-secrets-hidden">
+                        <div class="lobby-secrets-toggle"><i class="bi bi-fingerprint"></i><br>tap to reveal your badge</div>
+                        <span class="lobby-heading">
+                            your badge
+                        </span>
+                        <span class="lobby-secret">
+                            <span id="lobby_mysecret" class="lobby-secret-secret"></span>
+                        </span>
+                    </div>
+                    <button type="button" class="btn btn-secondary w-100 mt-3" data-bs-dismiss="modal">close</button>
+                </div>
+              </div>
+            </div>
+        </div>
+        <div id="modal_rules" class="modal" data-bs-backdrop="static" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-body text-center">
+                    <h1>about assassin</h1>
+                    <ul class="list-group mt-2 list-group-flush lobby-heading text-start">
+                        <li class="list-group-item lobby-heading-texteffect">trick your <b class="lobby-secret-texteffect">target</b> into saying the <b class="lobby-secret-texteffect">secret word</b> in a casual conversation.</li>
+                        <li class="list-group-item lobby-heading-texteffect">if you are tricked by another assassin, reveal your <b class="lobby-secret-texteffect">badge</b> by tapping the <b class="lobby-secret-texteffect">i've got eliminated</b> button</li>
+                        <li class="list-group-item lobby-heading-texteffect">your goal is to <b class="lobby-secret-texteffect">survive</b> as long as possible and to <b class="lobby-secret-texteffect">assassinate</b> as many people as possible (metaphorically)</li>
+                        <li class="list-group-item lobby-heading-texteffect">For each successfull assassination you can <b class="lobby-secret-texteffect">claim a reward</b> from the party host</li>
+                      </ul>
+                    <button type="button" class="btn btn-secondary w-100 mt-3" data-bs-dismiss="modal">close</button>
+                </div>
+              </div>
+            </div>
+        </div>
+
+        <div class="d-flex w-100 h-100 p-3 mx-auto flex-column">
+            <div class="row w-100 h-100 m-0 justify-content-center align-items-center">
+                <div class="col-12 text-center">
+                    <div id="lobby-main-container w-100">
+                        <div id="lobby-intro" class="mb-4">
+                            <h1 style="font-size: 4rem;">assassin</h1>
+                            <h5 id="lobby_mykillcount" class="d-none"><span>0</span> assassinations</h5>
+                        </div>
+                        <div id="lobby_code_container" class="row justify-content-center m-0 align-items-center lobby-container">
+                            <span id="lobby_code" class="lobby-secret">
+                                ...
+                            </span>
+                            <span class="lobby-heading">
+                                announce yourself to the party host
+                            </span>
+                        </div>
+                        <div id="lobby_deathscreen_container" class="d-none">
+                            <div class="row justify-content-center m-0 align-items-center lobby-container" style="border:5px solid #e62d2d;box-shadow: 0px 0px 30px 0px #d72d2d;">
+                                <span class="lobby-heading">
+                                    you survived for
+                                </span>
+                                <span class="lobby-secret">
+                                    <span id="assassinated_by_survivedfor" class="lobby-secret-secret lobby-secret-green"></span>
+                                </span>
+                                <span class="lobby-heading">
+                                    you've been assassinated by
+                                </span>
+                                <span class="lobby-secret">
+                                    <span id="assassinated_by_name" class="lobby-secret-secret"></span>
+                                </span>
+                                <span class="lobby-heading">
+                                    because you said
+                                </span>
+                                <span class="lobby-secret">
+                                    <span id="assassinated_by_word" class="lobby-secret-secret"></span>
+                                </span>
+                            </div>
+                        </div>
+                        <div id="lobby_gameisover_container" class="d-none">
+                            <div class="row justify-content-center m-0 align-items-center lobby-container" style="border:5px solid #e62d2d;">
+                                <span class="lobby-heading">
+                                    the game is over! thank you for playing. the party host will soon announce the results.
+                                </span>
+                            </div>
+                        </div>
+                        <div id="lobby_game_container" class="d-none">
+                            <div id="lobby_secrets_target" class="row justify-content-center m-0 align-items-center lobby-container lobby-secrets-hidden">
+                                <div class="lobby-secrets-toggle"><i class="bi bi-fingerprint"></i><br>tap to reveal target</div>
+                                <span class="lobby-heading">
+                                    your target
+                                </span>
+                                <span class="lobby-secret">
+                                    <span id="lobby_target" class="lobby-secret-secret"></span>
+                                </span>
+                                <span class="lobby-heading mt-3 d-flex align-items-center justify-content-center">
+                                    secret word <i id="lobby_word_button_redraw" class="bi bi-arrow-repeat ms-2 text-white"></i>
+                                </span>
+                                <span class="lobby-secret">
+                                    <span class="lobby-secret-secret"><span id="lobby_word"></span></span>
+                                </span>
+                                <span class="lobby-help" id="lobby_button_help">
+                                    <span><i class="bi bi-question-circle me-2"></i>how it works</span>
+                                </span>
+                            </div>
+                            <button id="lobby_button_report_mission_done" class="btn btn-primary mt-3 w-100 d-flex align-items-center justify-content-center" data-bs-toggle="modal" data-bs-target="#modal_missioncomplete"><i class="bi bi-check"></i> report mission complete</button>
+                            <button id="lobby_button_report_mission_done" class="btn btn-primary mt-2 w-100 d-flex align-items-center justify-content-center" data-bs-toggle="modal" data-bs-target="#modal_ivegotkilled"><i class="bi bi-x"></i> i've got eliminated</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="status_bar">
+                <span id="status_lobby_code">---</span> | <span id="status_name">---</span> | <span id="status_websocket">closed</span> 
+            </div>
+        </div>
+
+        <script>
+            const ws_client = new ReconnectingWebSocketClient(`wss://${location.host}/players`);
+
+            function fitTextToBox(element, text_addition = 0, minFontSize = 10, maxFontSize = 36, minChar = 10, maxChar = 80) {
+                const textLength = element.textContent.trim().length + text_addition;
+                let fontSize;
+                // Interpolate font size within bounds
+                if (textLength <= minChar) {
+                    fontSize = maxFontSize;
+                } else if (textLength >= maxChar) {
+                    fontSize = minFontSize;
+                } else {
+                    fontSize = maxFontSize - ((maxFontSize - minFontSize) * (textLength - minChar)) / (maxChar - minChar);
+                }
+                element.style.fontSize = `${fontSize}px`;
+            }
+
+            function formatDuration(seconds) {
+                seconds = Math.floor(seconds);
+                if (seconds < 60) {
+                    return `${seconds} second${seconds === 1 ? "" : "s"}`;
+                }
+
+                const minutes = Math.floor(seconds / 60);
+                if (seconds < 3600) {
+                    return `${minutes} minute${minutes === 1 ? "" : "s"}`;
+                }
+
+                const hours = Math.floor(seconds / 3600);
+                return `${hours} hour${hours === 1 ? "" : "s"}`;
+            }
+
+            function init_lobby(lobby_code) {
+                $("#lobby_code").text(lobby_code)
+                $("#status_lobby_code").text(lobby_code)
+            }
+            
+            ws_client.onMessage = (event) => {
+                const message = JSON.parse(event.data);
+                if (message.type == 'register') {
+                    $("#lobby_code_container").removeClass("d-none");
+                    $("#lobby_game_container").addClass("d-none");
+                    $("#lobby_deathscreen_container").addClass("d-none");
+                    $("#lobby_gameisover_container").addClass("d-none");
+                    $("#status_name").text("---");
+                    $("#lobby_mykillcount span").text("0");
+                    $("#lobby_mykillcount").addClass("d-none");
+                    localStorage.setItem("lobby_code", message.data);
+                    init_lobby(message.data);
+                }
+                if (message.type == 'lobby_keepwaiting') {
+                    $("#lobby_code_container").removeClass("d-none");
+                    $("#lobby_game_container").addClass("d-none");
+                    $("#lobby_deathscreen_container").addClass("d-none");
+                    $("#lobby_gameisover_container").addClass("d-none");
+                    $("#status_name").text("---");
+                    $("#lobby_mykillcount span").text("0");
+                    $("#lobby_mykillcount").addClass("d-none");
+
+                    $("#lobby_target").text("...");
+                    $("#lobby_word").text("...");
+
+                    for (var element of document.querySelectorAll(".lobby-secret-placeholder")) {
+                        fitTextToBox(element);
+                    }
+                    for (var element of document.querySelectorAll(".lobby-secret-secret")) {
+                        fitTextToBox(element);
+                    }
+                }
+                if (message.type == 'player_gamestate') {
+                    $("#lobby_code_container").addClass("d-none");
+                    $("#lobby_game_container").removeClass("d-none");
+                    $("#lobby_deathscreen_container").addClass("d-none");
+                    $("#lobby_gameisover_container").addClass("d-none");
+                    $("#lobby_secrets_target").addClass("lobby-secrets-hidden");
+
+                    $("#status_name").text(message.data.name);
+                    $("#lobby_mykillcount span").text(message.data.kills);
+                    $("#lobby_mykillcount").removeClass("d-none");
+
+                    if (message.data.game_is_over) {
+                        $("#lobby_game_container").addClass("d-none");
+                        $("#lobby_gameisover_container").removeClass("d-none");
+                    } else if(message.data.assassinated_by) {
+                        var modal = bootstrap.Modal.getInstance(document.getElementById("modal_ivegotkilled"));
+                        if (modal) modal.hide();
+                        $("#lobby_game_container").addClass("d-none");
+                        $("#lobby_deathscreen_container").removeClass("d-none");
+
+                        $("#assassinated_by_name").text(message.data.assassinated_by.name);
+                        $("#assassinated_by_word").text(message.data.assassinated_by.word);
+
+                        var seconds_survived = (message.data.assassinated_by.time - message.data.time_associated) * 0.001;
+                        $("#assassinated_by_survivedfor").text(formatDuration(seconds_survived > 0 ? seconds_survived : 0));
+                    } else if (message.data.target) {
+                        $("#lobby_target").text(message.data.target.name);
+                        $("#lobby_word").text(message.data.word);
+                        $("#modal_word_redraw_currentword").text(message.data.word);
+                        $("#lobby_mysecret").text(message.data.code);
+
+                        if (message.data.redraws && message.data.redraws > 0) {
+                            $("#lobby_word_button_redraw").addClass("d-none");
+                        } else {
+                            $("#lobby_word_button_redraw").removeClass("d-none");
+                        }
+                    }
+
+                    for (var element of document.querySelectorAll(".lobby-secret-placeholder")) {
+                        fitTextToBox(element);
+                    }
+                    for (var element of document.querySelectorAll(".lobby-secret-secret")) {
+                        fitTextToBox(element);
+                    }
+                }
+                if (message.type == 'player_reportkill') {
+                    if (message.data.success) {
+                        $("#modal_missioncomplete").addClass("correctcode")
+
+                        setTimeout(function() {
+                            $("#modal_missioncomplete_loading").css("visibility","hidden");
+                            $("#modal_missioncomplete_title").text("good work, agent!");
+                            $("#modal_missioncomplete_subtitle").text(`you will inherit the mission of ${message.data.name}`);
+                            $("#modal_missioncomplete_heading").text("your assassination count");
+                            $("#lobby_secrets_targetsecret_input").addClass("d-none");
+                            $("#lobby_missioncomplete_killcount").removeClass("d-none");
+                            $("#lobby_missioncomplete_killcount").text(message.data.kills);
+                            $("#modal_missioncomplete_close").removeAttr("disabled");
+                            $("#modal_missioncomplete_close").text("continue");
+                        }, 2000);
+                    } else {
+                        $("#modal_missioncomplete_close").removeAttr("disabled");
+                        $(input).removeAttr("disabled");
+                        $("#lobby_secrets_targetsecret_input_vis1").html("&nbsp;");
+                        $("#lobby_secrets_targetsecret_input_vis2").html("&nbsp;");
+                        $("#lobby_secrets_targetsecret_input_vis3").html("&nbsp;");
+                        $("#lobby_secrets_targetsecret_input_vis4").html("&nbsp;");
+                        $("#modal_missioncomplete_loading").css("visibility","hidden");
+
+                        $("#lobby_secrets_targetsecret_input").addClass("d-none");
+                        $("#lobby_secrets_targetsecret_wrongsecret").removeClass("d-none");
+                    }
+                }
+                if (message.type == 'player_redraw') {
+                    if (message.data) {
+                        $("#modal_word_redraw_success").removeClass("d-none");
+                        $("#modal_word_redraw_failed").addClass("d-none");
+                        $("#modal_word_redraw_pre_section").addClass("d-none");
+                        $("#modal_word_redraw_submit").attr("disabled", true);
+                        $("#modal_word_redraw_new").text(message.data);
+                    } else {
+                        $("#modal_word_redraw_failed").removeClass("d-none");
+                        $("#modal_word_redraw_pre_section").addClass("d-none");
+                        $("#modal_word_redraw_success").addClass("d-none");
+                    }
+                }
+                console.log(message.data)
+            }
+
+            ws_client.onOpen = (event) => {
+                $("#status_websocket").text("connected");
+                if (localStorage.hasOwnProperty("lobby_code")) {
+                    ws_client.send(JSON.stringify({
+                        type: 'login',
+                        data: localStorage.getItem("lobby_code")
+                    }))
+                    init_lobby(localStorage.getItem("lobby_code"));
+                } else {
+                    ws_client.send(JSON.stringify({
+                        type: 'register'
+                    }))
+                }
+            }
+
+            ws_client.onClose = (event) => {
+                $("#status_websocket").text("closed");
+            }
+
+            async function load() { ws_client.connect();}
+
+            $("#lobby_button_help").on("click", function(e) {
+                e.stopPropagation();
+                (new bootstrap.Modal(document.getElementById('modal_rules'))).show();
+            })
+
+            $(".lobby-container").on("click", function() {
+                if (!($(this).find(".lobby-secrets-toggle").length)) return;
+                if ($(this).hasClass("lobby-secrets-hidden")) {
+                    $(this).removeClass("lobby-secrets-hidden");
+                } else {
+                    $(this).addClass("lobby-secrets-hidden");
+                }
+            })
+
+            var input = $("#lobby_secrets_targetsecret_input input")[0];
+
+            input.addEventListener("keydown", (e) => {
+                const allowedKeys = [
+                    "Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"
+                ];
+
+                if (allowedKeys.includes(e.key) || e.ctrlKey || e.metaKey) {
+                    return;
+                }
+
+                const pos = input.value.length;
+
+                if (pos < 2 && !/^[a-zA-Z]$/.test(e.key)) {
+                    e.preventDefault();
+                }
+
+                if (pos >= 2 && pos < 4 && !/^[0-9]$/.test(e.key)) {
+                    e.preventDefault();
+                }
+
+                if (pos >= 4) {
+                    e.preventDefault();
+                }
+            });
+
+            var last_code = '0000';
+            input.addEventListener("input", () => {
+                let value = input.value.toUpperCase();
+                let result = "";
+
+                for (const char of value) {
+                    if (result.length < 2 && /[A-Z]/.test(char)) {
+                        result += char;
+                    } else if (result.length >= 2 && result.length < 4 && /[0-9]/.test(char)) {
+                        result += char;
+                    }
+                }
+
+                input.value = result;
+
+                $("#lobby_secrets_targetsecret_input_vis1").html(input.value.length > 0 ? input.value[0] : "&nbsp;");
+                $("#lobby_secrets_targetsecret_input_vis2").html(input.value.length > 1 ? input.value[1] : "&nbsp;");
+                $("#lobby_secrets_targetsecret_input_vis3").html(input.value.length > 2 ? input.value[2] : "&nbsp;");
+                $("#lobby_secrets_targetsecret_input_vis4").html(input.value.length > 3 ? input.value[3] : "&nbsp;");
+
+                if (input.value.length == 4 && last_code != input.value) {
+                    last_code = input.value;
+                    $(input).attr("disabled", true);
+                    $(modal_missioncomplete_close).attr("disabled", true);
+                    $("#modal_missioncomplete_loading").css("visibility","visible");
+
+                    ws_client.send({
+                        type: 'player_reportkill',
+                        data: input.value.toUpperCase()
+                    });
+                }
+            });
+
+            document.getElementById('modal_ivegotkilled').addEventListener('shown.bs.modal', function () {
+                $("#lobby_secrets_mysecret").addClass("lobby-secrets-hidden");
+            })
+
+            document.getElementById('modal_missioncomplete').addEventListener('shown.bs.modal', function () {
+                $("#lobby_secrets_targetsecret_input").removeClass("d-none");
+                $("#lobby_secrets_targetsecret_wrongsecret").addClass("d-none");
+
+                if (!$(input).attr("disabled")) {
+                    $(input).val("");
+                    $("#lobby_secrets_targetsecret_input_vis1").html("&nbsp;");
+                    $("#lobby_secrets_targetsecret_input_vis2").html("&nbsp;");
+                    $("#lobby_secrets_targetsecret_input_vis3").html("&nbsp;");
+                    $("#lobby_secrets_targetsecret_input_vis4").html("&nbsp;");
+                }
+                $(input).focus();
+            });
+
+            $("#modal_missioncomplete_close").on("click", (e) => {
+                if ($("#modal_missioncomplete").hasClass("correctcode"))
+                    window.location.reload();
+            })
+
+            $("#lobby_word_button_redraw").on("click", function(e) {
+                e.stopPropagation();
+                $("#modal_word_redraw_pre_section").removeClass("d-none");
+                $("#modal_word_redraw_success").addClass("d-none");
+                $("#modal_word_redraw_failed").addClass("d-none");
+                $("#modal_word_redraw_submit").removeAttr("disabled");
+
+                (new bootstrap.Modal(document.getElementById('modal_word_redraw'))).show();
+            })
+
+            $("#modal_word_redraw_submit").on("click", function() {
+                ws_client.send({
+                    type: 'player_redrawword'
+                });
+            });
+            
+            window.addEventListener('DOMContentLoaded', load);
+        </script>
+    </body>
+</html>
